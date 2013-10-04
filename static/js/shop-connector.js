@@ -7,7 +7,9 @@
      * fetching shopify data using shop-connector app.
      */
     function ShopConnector() {
-        this.rootUrl = "http://localhost:8000";
+
+        this.rootUrl = "http://shopify-connector.appspot.com/";
+        //this.rootUrl = "http://localhost:8000";
         this.productUrl = this.rootUrl + '/api/v1/product/';
         this.collectionUrl = this.rootUrl + '/api/v1/collection/';
 
