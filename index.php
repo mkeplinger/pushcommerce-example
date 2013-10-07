@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="/static/ico/favicon.png">
+    <link rel="shortcut icon" href="static/ico/favicon.png">
 
     <!-- Bootstrap core CSS -->
     <title>ShopConnector Minimalistic Prototype</title>
-    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+    <link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -76,7 +76,7 @@
             <div class="container">
               <div class="carousel-caption">
                 <h1>{{ name }}</h1>
-                <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+                <p>{{ body_html }}...</p>
                 <p><a class="btn btn-large btn-primary" href="#">Learn more</a></p>
               </div>
             </div>
@@ -103,14 +103,17 @@
         <script class="collection-template" type="text/x-shop-connector-template">
         {{#foreach collections}}
           <div class="col-lg-4">
-            <img class="img-circle" src="{{#if image}}{{image}}{{else}}/static/img/no-image.jpg{{/if}}">
+            <img class="img-circle" src="{{#if image}}{{image}}{{else}}static/img/no-image.jpg{{/if}}" width="193px" height="185px">
             <h2>{{ title }}</h2>
-            <p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+            <div class="collection-body">
+            	{{ body_html }}
+            </div>
             <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
           </div><!-- /.col-lg-4 -->
-        </div><!-- /.row -->
         {{/foreach}}
         </script>
+        
+      </div><!-- .row -->
 
 
 
@@ -124,14 +127,14 @@
     </div><!-- /.container -->
 
 
-    <script type="text/javascript" src="/static/shopify-connector/shopify-connector.js"></script>
-    <script type="text/javascript" src="/static/js/shop.js"></script>
+    <script type="text/javascript" src="static/shopify-connector/shopify-connector.js"></script>
+    <script type="text/javascript" src="static/js/shop.js"></script>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/static/js/libs/jquery.js"></script>
-    <script src="/static/js/libs/holder.js"></script>
-    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="static/js/libs/jquery.js"></script>
+    <script src="static/js/libs/holder.js"></script>
+    <script src="static/bootstrap/js/bootstrap.min.js"></script>
   </body>
 </html>
