@@ -1,4 +1,7 @@
-(function(window, undefined){
+
+// HandlebarJS helpers specially designed to simplify shopify connector template enhancement.
+
+(function(window, undefined) {
 
     /**
      * Provides the looping functionality, adds $first, $last and $index to the item.

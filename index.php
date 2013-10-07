@@ -124,10 +124,7 @@
     </div><!-- /.container -->
 
 
-    <script type="text/javascript" src="/static/js/handlebars.js"></script>
-    <script type="text/javascript" src="/static/js/helpers.js"></script>
-    <script type="text/javascript" src="/static/js/jsonp.js"></script>
-    <script type="text/javascript" src="/static/js/shop-connector.js"></script>
+    <script type="text/javascript" src="/static/shopify-connector/shopify-connector.js"></script>
     <script type="text/javascript" src="/static/js/shop.js"></script>
 
     <!-- Bootstrap core JavaScript

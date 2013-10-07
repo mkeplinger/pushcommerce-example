@@ -1,7 +1,222 @@
-//Libs
+/**
+ * Copyright (c) 2013 SmashBrand
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ **/
+
+(function(window, undefined) {
+    "use sctrict";
+
+    /**
+     * Represents the shop-connector class which defines members useful for
+     * fetching shopify data using shop-connector app.
+     */
+    function ShopConnector() {
+
+        this.rootUrl = "http://shopify-connector.appspot.com/";
+        //this.rootUrl = "http://localhost:8000";
+        this.productUrl = this.rootUrl + '/api/v1/product/';
+        this.collectionUrl = this.rootUrl + '/api/v1/collection/';
+
+        this.config = {
+            defaultLimit: 20
+        };
+    }
+
+    ShopConnector.prototype = {
+
+        /**
+         * Executes the JSONP get request to fetch json response fron the server.
+         *
+         * @param  {[type]}   url      The request url.
+         * @param  {[type]}   params   The request parameters.
+         * @param  {Function} callback The callback which needs to be invoked when response is received.
+         **/
+        getJSON: function queryServer(url, callback, params) {
+            var param,
+                queryString = [];
+
+            params = params || {};
+            jsonp.getJSON(url, callback, params, this);
+        },
+
+        /**
+         * Gets the products response from the shop-connector.
+         * @param  {Function} callback    [description]
+         * @param  {[type]}   productType [description]
+         * @param  {[type]}   page        [description]
+         * @param  {[type]}   limit       [description]
+         **/
+        getProducts: function getProducts(callback, productType, page, limit) {
+            var params,
+                url = this.productUrl;
+
+            params  = {
+                page: page || 1,
+                limit: limit || this.config.defaultLimit
+            };
+
+            if (productType) {
+                params.productType = productType;
+            }
+
+            jsonp.getJSON(url, callback, params);
+        },
+
+        getProductDetail: function getProduct(handle, callback) {
+          var url = this.productUrl + handle + '/';
+          jsonp.getJSON(url, callback);
+        },
+
+        getCollections: function getCollections(callback, page, limit) {
+            var params,
+                url = this.collectionUrl;
+
+            params  = {
+                page: page || 1,
+                limit: limit || this.config.defaultLimit
+            };
+
+            jsonp.getJSON(url, callback, params);
+        },
+
+        getCollectionDetail: function getCollection(handle, callback, productType) {
+            var url = this.collectionUrl + handle + '/';
+            jsonp.getJSON(url, callback);
+        },
+
+        /**
+         * Renders the template scripts into its parent node.
+         *
+         * @function
+         * @param {object} context The rendering context, usually the data received from shop-connector application.
+         * @param {Array(string)}
+         **/
+        renderTemplate: function renderTemplate(templateElement, context) {
+
+            var templateElement,
+                parent,
+                removableScripts = [],
+                source, html, templateTag, template,
+                i, iLen,
+                j, jLen, templateChildren;
+
+            if (templateElement.getAttribute('type') !== 'text/x-shop-connector-template') {
+                throw new Error('Invalid template. The attribute type="text/x-shop-connector-template" not found.');
+            }
 
 
-//Handlebars
+            source = templateElement.innerHTML;
+            template = Handlebars.compile(source);
+            html = template(context);
+
+            templateTag = document.createElement('div');
+            templateTag.innerHTML = html;
+
+            parent = templateElement.parentElement;
+            templateChildren = templateTag.children;
+            for(j=0, jLen=templateChildren.length; j < jLen; j += 1) {
+                parent.insertBefore(templateChildren[0], templateElement);
+            }
+            removableScripts.push(templateElement);
+
+            for (i=0, iLen=removableScripts.length; i < iLen; i += 1) {
+                removableScripts[i].parentElement.removeChild(removableScripts[i]);
+            }
+        },
+
+        render: function render(selector, context) {
+          var i, iLen, elements,
+              self = this;
+
+          //If querySelectorAll is available use this function
+          //to query selector.
+          if (typeof document.querySelectorAll === 'function') {
+            elements = document.querySelectorAll(selector);
+            for(i=0, iLen=elements.length; i < iLen; i += 1) {
+              this.renderTemplate(elements[i], context);
+            }
+            return;
+          }
+          //If querySelectorAll is not available, check if jQuery is available.
+          //If yes use jQuery
+          // else if (window.jQuery !== undefined) {
+          //   $(selector).each(function(index, element){
+          //     self.renderTemplate(element, context);
+          //   });
+          //   return;
+          // }
+          throw new Error('Selector functionality not available in your browser, to fix please either use jQuery or use renderTemplate function.');
+        }
+    };
+
+    window.shopConnector = new ShopConnector();
+
+
+})(this);
+
+// JSONP module
+(function(window, undefined) {
+    "use strict";
+
+    function JSONP() {}
+
+    JSONP.prototype = {
+
+        getJSON: function(url, callback, data) {
+            var src = url + (url.indexOf("?")+1 ? "&" : "?"),
+                head = document.getElementsByTagName("head")[0],
+                newScript = document.createElement("script"),
+                timestamp =  (new Date()).getTime(),
+                callbackFunc = "callback" + timestamp,
+                params = [],
+                param_name = "",
+                self = this;
+
+            data = data || {};
+
+
+            this[callbackFunc] = function(data) {
+                callback(data);
+             };
+
+            data["callback"] = "jsonp." + callbackFunc;
+            for(param_name in data){
+                if (data.hasOwnProperty(param_name)) {
+                    params.push(param_name + "=" + encodeURIComponent(data[param_name]));
+                }
+            }
+            src += params.join("&");
+
+            newScript.type = "text/javascript";
+            newScript.src = src;
+            newScript.async = true;
+            //newScript.id = callbackFunc.replace(/\./g, '-');
+
+            head.appendChild(newScript);
+        }
+    };
+
+    window.jsonp = new JSONP();
+
+})(this);
 
 /*
 
@@ -2282,70 +2497,33 @@ Handlebars.template = Handlebars.VM.template;
 })(Handlebars);
 ;
 
-//jx
 
-//V3.01.A - http://www.openjs.com/scripts/jx/
-jx = {
-  //Create a xmlHttpRequest object - this is the constructor.
-  getHTTPObject : function() {
-    var http = false;
-    //Use IE's ActiveX items to load the file.
-    if(typeof ActiveXObject != 'undefined') {
-      try {http = new ActiveXObject("Msxml2.XMLHTTP");}
-      catch (e) {
-        try {http = new ActiveXObject("Microsoft.XMLHTTP");}
-        catch (E) {http = false;}
-      }
-    //If ActiveX is not available, use the XMLHttpRequest of Firefox/Mozilla etc. to load the document.
-    } else if (window.XMLHttpRequest) {
-      try {http = new XMLHttpRequest();}
-      catch (e) {http = false;}
-    }
-    return http;
-  },
-  // This function is called from the user's script.
-  //Arguments -
-  //  url - The url of the serverside script that is to be called. Append all the arguments to
-  //      this url - eg. 'get_data.php?id=5&car=benz'
-  //  callback - Function that must be called once the data is ready.
-  //  format - The return type for this function. Could be 'xml','json' or 'text'. If it is json,
-  //      the string will be 'eval'ed before returning it. Default:'text'
-  load : function (url,callback,format) {
-    var http = this.init(); //The XMLHttpRequest object is recreated at every call - to defeat Cache problem in IE
-    if(!http||!url) return;
-    if (http.overrideMimeType) http.overrideMimeType('text/xml');
+// HandlebarJS helpers specially designed to simplify shopify connector template enhancement.
 
-    if(!format) var format = "text";//Default return type is 'text'
-    format = format.toLowerCase();
+(function(window, undefined) {
 
-    //Kill the Cache problem in IE.
-    var now = "uid=" + new Date().getTime();
-    url += (url.indexOf("?")+1) ? "&" : "?";
-    url += now;
-
-    http.open("GET", url, true);
-
-    http.onreadystatechange = function () {//Call a function when the state changes.
-      if (http.readyState == 4) {//Ready State will be 4 when the document is loaded.
-        if(http.status == 200) {
-          var result = "";
-          if(http.responseText) result = http.responseText;
-
-          //If the return is in JSON format, eval the result before returning it.
-          if(format.charAt(0) == "j") {
-            //\n's in JSON string, when evaluated will create errors in IE
-            result = result.replace(/[\n\r]/g,"");
-            result = eval('('+result+')');
-          }
-
-          //Give the data to the callback function.
-          if(callback) callback(result);
-        } else { //An error occured
-          if(error) error(http.status);
+    /**
+     * Provides the looping functionality, adds $first, $last and $index to the item.
+     * @example
+     * {{#foreach list}}
+     * {{#if $first}} First Item {{/if}}
+     * {{/foreach}}
+     */
+    Handlebars.registerHelper("foreach",function(arr,options) {
+        if (options.inverse && !arr.length) {
+            return options.inverse(this);
         }
-      }
-    }
-    http.send(null);
-  },
-  init : function() {return this.getHTTPObject();}
-}
+
+        return arr.map(function(item,index) {
+            if (typeof item === 'string') {
+                var item = new String(item);
+            }
+
+            item.$index = index;
+            item.$first = index === 0;
+            item.$last  = index === arr.length-1;
+            return options.fn(item);
+        }).join('');
+    });
+
+})(this);
