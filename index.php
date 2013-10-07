@@ -76,7 +76,7 @@
             <div class="container">
               <div class="carousel-caption">
                 <h1>{{ name }}</h1>
-                <p>{{ body_html }}...</p>
+                <p>{{{ body_html }}}...</p>
                 <p><a class="btn btn-large btn-primary" href="#">Learn more</a></p>
               </div>
             </div>
@@ -106,7 +106,7 @@
             <img class="img-circle" src="{{#if image}}{{image}}{{else}}static/img/no-image.jpg{{/if}}" width="193px" height="185px">
             <h2>{{ title }}</h2>
             <div class="collection-body">
-            	{{ body_html }}
+            	{{{limit body_html 30}}}
             </div>
             <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
           </div><!-- /.col-lg-4 -->
@@ -128,6 +128,7 @@
 
 
     <script type="text/javascript" src="static/shopify-connector/shopify-connector.js"></script>
+    <script type="text/javascript" src="static/shopify-connector/src/helpers.js"></script>
     <script type="text/javascript" src="static/js/shop.js"></script>
 
     <!-- Bootstrap core JavaScript
