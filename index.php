@@ -126,6 +126,11 @@
 
     </div><!-- /.container -->
 
+    <!-- Paceholder for New way to call API and bind it to a specific class 
+         which is later called with a <script type="text/x/shop-connector-template"> tag  -->
+    <script>_pushcommerce.get(['collection/frontpage/', 'frontpage-template']);</script>
+    <script>_pushcommerce.get(['collection/?product-type=coffee', 'collection-template']);</script>    
+    <script>_pushcommerce.get(['product/10-5oz-mug/', 'coffee-mug-template']);</script>]
 
     <script type="text/javascript" src="static/shopify-connector/shopify-connector.js"></script>
     <script type="text/javascript" src="static/shopify-connector/src/helpers.js"></script>
