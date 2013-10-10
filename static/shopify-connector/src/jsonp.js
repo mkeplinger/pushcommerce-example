@@ -21,6 +21,7 @@
 
 
             this[callbackFunc] = function(data) {
+                alert ('cool')
                 callback(data);
              };
 

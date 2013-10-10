@@ -28,9 +28,42 @@
     });
 
     Handlebars.registerHelper('limit',function(str,max) {
-        if (str.length > max)
+        if (str.length > max) {
             return str.substring(0,max) + '...';
+        }
         return str;
     });
+
+    /**
+     * Strip downs html tags from given string and returns its substring
+     * truncating charcters from next space onwards after max.
+     * @example
+     * {{nohtml body_html 100}}
+     **/
+    Handlebars.registerHelper('nohtml',function(str,max) {
+
+        str = str || '';
+
+        var nohtml = str.replace(/(<([^>]+)>)/ig,""),
+            length = max || nohtml.length,
+            m, index = length,
+            ellipsis = '';
+
+
+        if (nohtml.length > length) {
+            re = /\s/g;
+            while(m = re.exec(nohtml)) {
+                if (m.index > length-1) {
+                    index = m.index;
+                    ellipsis = '...'; //string truncted hence provide ellipses
+                    break;
+                }
+            }
+            return nohtml.substring(0,index) + ellipsis;
+        }
+        return nohtml;
+    });
+
+
 
 })(this);

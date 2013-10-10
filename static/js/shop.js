@@ -3,16 +3,14 @@
 
     window.onload = function() {
 
-        shopConnector.getCollectionDetail('frontpage', function(context){
-            shopConnector.render('.frontpage-template', context);
-        });
+        // shopifyConnector.getCollectionDetail('frontpage', function(context){
+        //     shopifyConnector.render('.frontpage-template', context);
+        // });
 
-        shopConnector.getCollections(function(context) {
-            console.log(context);
-            shopConnector.render('.collection-template', context);
-        }, 1, 50);
-
+        // shopifyConnector.getCollections(function(context) {
+        //     console.log(context);
+        //     shopifyConnector.render('.collection-template', context);
+        // }, 1, 50);
     };
-
 
 })(this);

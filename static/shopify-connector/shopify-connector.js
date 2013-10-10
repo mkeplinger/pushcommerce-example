@@ -21,6 +21,7 @@
  *
  **/
 
+
 (function(window, undefined) {
     "use sctrict";
 
@@ -28,19 +29,21 @@
      * Represents the shop-connector class which defines members useful for
      * fetching shopify data using shop-connector app.
      */
-    function ShopConnector() {
+    function ShopifyConnector() {
 
-        this.rootUrl = "http://shopify-connector.appspot.com/";
-        //this.rootUrl = "http://localhost:8000";
-        this.productUrl = this.rootUrl + '/api/v1/product/';
-        this.collectionUrl = this.rootUrl + '/api/v1/collection/';
+        //this.rootUrl = "http://shopify-connector.appspot.com/api/v1/";
+        this.rootUrl = "http://localhost:8000";
+        this.productUrl = this.rootUrl + '/product/';
+        this.collectionUrl = this.rootUrl + '/collection/';
+        this.utils = {};
+        this.cachedContext = {};
 
         this.config = {
             defaultLimit: 20
         };
     }
 
-    ShopConnector.prototype = {
+    ShopifyConnector.prototype = {
 
         /**
          * Executes the JSONP get request to fetch json response fron the server.
@@ -49,7 +52,7 @@
          * @param  {[type]}   params   The request parameters.
          * @param  {Function} callback The callback which needs to be invoked when response is received.
          **/
-        getJSON: function queryServer(url, callback, params) {
+        getJSON: function getJSON(url, callback, params) {
             var param,
                 queryString = [];
 
@@ -111,17 +114,34 @@
          **/
         renderTemplate: function renderTemplate(templateElement, context) {
 
-            var templateElement,
-                parent,
+            var parent,
                 removableScripts = [],
                 source, html, templateTag, template,
                 i, iLen,
-                j, jLen, templateChildren;
+                j, jLen, templateChildren,
+                self = this;
 
-            if (templateElement.getAttribute('type') !== 'text/x-shop-connector-template') {
-                throw new Error('Invalid template. The attribute type="text/x-shop-connector-template" not found.');
+            //debugger;
+
+            if (templateElement.getAttribute('type') !== 'text/x-shopify-connector-template') {
+                throw new Error('Invalid template. The attribute type="text/x-shopify-connector-template" not found.');
             }
 
+            if (typeof context === "string") {
+                //TODO: Improve caching...
+                if (self.cachedContext[context]) {
+                    self.renderTemplate(templateElement, self.cachedContext[context]);
+                }
+                else {
+                    self.getJSON(self.rootUrl + context, function(data) {
+                        self.cachedContext[context] = data;
+                        self.renderTemplate(templateElement, data);
+                    });
+                }
+                return;
+            }
+
+            console.log(context);
 
             source = templateElement.innerHTML;
             template = Handlebars.compile(source);
@@ -143,32 +163,79 @@
         },
 
         render: function render(selector, context) {
-          var i, iLen, elements,
-              self = this;
+            var i, iLen, elements,
+                self = this;
 
-          //If querySelectorAll is available use this function
-          //to query selector.
-          if (typeof document.querySelectorAll === 'function') {
-            elements = document.querySelectorAll(selector);
+            elements = shopifyConnector.utils.querySelectorAll(selector);
+            if (elements === null) {
+                throw new Error('Selector functionality not available in your browser, to fix please either use jQuery or use renderTemplate function.');
+            }
+
             for(i=0, iLen=elements.length; i < iLen; i += 1) {
               this.renderTemplate(elements[i], context);
             }
-            return;
-          }
-          //If querySelectorAll is not available, check if jQuery is available.
-          //If yes use jQuery
-          // else if (window.jQuery !== undefined) {
-          //   $(selector).each(function(index, element){
-          //     self.renderTemplate(element, context);
-          //   });
-          //   return;
-          // }
-          throw new Error('Selector functionality not available in your browser, to fix please either use jQuery or use renderTemplate function.');
         }
     };
 
-    window.shopConnector = new ShopConnector();
+    var shopifyConnector = new ShopifyConnector();
 
+    /**
+     * Finds and returns the array of html elements that matches with specified css selector.
+     * @param  {string} selector The selector
+     * @return {Array(HtmlElement)} An array of html element.
+     *
+     **/
+    shopifyConnector.utils.querySelectorAll = function querySelectorAll(selector) {
+        var elements = [];
+
+        // If querySelectorAll is available use this function
+        // to query selector.
+        if (typeof document.querySelectorAll === 'function') {
+            return document.querySelectorAll(selector);
+        }
+
+        // If querySelectorAll is not available, check if jQuery is available.
+        // If yes use jQuery
+        if (window.jQuery !== undefined) {
+            $(selector).each(function(index, element){
+              elements.push(element);
+            });
+            return elements;
+        }
+        return null;
+    };
+
+    window.shopifyConnector = shopifyConnector;
+
+    function renderShopifyConnectorTemplates() {
+        var scripts, script, renderableScripts = [],
+            type, src,
+            i, iLen;
+
+        scripts = document.getElementsByTagName('script');
+
+        for (i=0, iLen=scripts.length; i < iLen; i += 1) {
+            script = scripts[i];
+            type = script.getAttribute('type');
+            src = script.getAttribute('data-src');
+
+            if (type === 'text/x-shopify-connector-template' && src) {
+                renderableScripts.push({
+                    script: script,
+                    src: src
+                });
+            }
+        }
+        for(i=0, iLen=renderableScripts.length; i < iLen; i += 1) {
+            shopifyConnector.renderTemplate(
+                renderableScripts[i].script, renderableScripts[i].src);
+        }
+    }
+
+    var addListener = window.attachEvent || window.addEventListener,
+        loadEvent = window.attachEvent ? "onload" : "load";
+
+    addListener(loadEvent, renderShopifyConnectorTemplates);
 
 })(this);
 
@@ -194,6 +261,7 @@
 
 
             this[callbackFunc] = function(data) {
+                alert ('cool')
                 callback(data);
              };
 
@@ -2525,5 +2593,44 @@ Handlebars.template = Handlebars.VM.template;
             return options.fn(item);
         }).join('');
     });
+
+    Handlebars.registerHelper('limit',function(str,max) {
+        if (str.length > max) {
+            return str.substring(0,max) + '...';
+        }
+        return str;
+    });
+
+    /**
+     * Strip downs html tags from given string and returns its substring
+     * truncating charcters from next space onwards after max.
+     * @example
+     * {{nohtml body_html 100}}
+     **/
+    Handlebars.registerHelper('nohtml',function(str,max) {
+
+        str = str || '';
+
+        var nohtml = str.replace(/(<([^>]+)>)/ig,""),
+            length = max || nohtml.length,
+            m, index = length,
+            ellipsis = '';
+
+
+        if (nohtml.length > length) {
+            re = /\s/g;
+            while(m = re.exec(nohtml)) {
+                if (m.index > length-1) {
+                    index = m.index;
+                    ellipsis = '...'; //string truncted hence provide ellipses
+                    break;
+                }
+            }
+            return nohtml.substring(0,index) + ellipsis;
+        }
+        return nohtml;
+    });
+
+
 
 })(this);

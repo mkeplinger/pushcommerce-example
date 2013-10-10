@@ -41,7 +41,7 @@
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Categories <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <script class="collection-template" type="text/x-shop-connector-template">
+                    <script class="collection-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
                     {{#foreach collections}}
                       <li><a href="#">{{ title }}</a></li>
                     {{/foreach}}
@@ -62,21 +62,21 @@
     <div id="myCarousel" class="carousel slide">
       <!-- Indicators -->
       <ol class="carousel-indicators">
-        <script id='products-carousel-indicator' class="frontpage-template" type="text/x-shop-connector-template">
+        <script id='products-carousel-indicator' class="frontpage-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/frontpage/">
         {{#foreach products}}
         <li data-target="#myCarousel" data-slide-to="{{ $index }}" class="{{#if $first}}active{{/if}}"></li>
         {{/foreach}}
         </script>
       </ol>
       <div class="carousel-inner">
-        <script id='products-carousel' class="frontpage-template" type="text/x-shop-connector-template">
+        <script id='products-carousel' class="frontpage-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/frontpage/">
           {{#foreach products}}
           <div class="item {{#if $first}}active{{/if}}">
             <div class="img" style="background-image:url({{ featured_image }})"></div>
             <div class="container">
               <div class="carousel-caption">
                 <h1>{{ name }}</h1>
-                <p>{{{ body_html }}}...</p>
+                <p>{{{ nohtml body_html 50}}}</p>
                 <p><a class="btn btn-large btn-primary" href="#">Learn more</a></p>
               </div>
             </div>
@@ -100,7 +100,7 @@
       <!-- Three columns of text below the carousel -->
       <div class="row">
 
-        <script class="collection-template" type="text/x-shop-connector-template">
+        <script class="collection-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
         {{#foreach collections}}
           <div class="col-lg-4">
             <img class="img-circle" src="{{#if image}}{{image}}{{else}}static/img/no-image.jpg{{/if}}" width="193px" height="185px">
@@ -112,7 +112,7 @@
           </div><!-- /.col-lg-4 -->
         {{/foreach}}
         </script>
-        
+
       </div><!-- .row -->
 
 
@@ -126,14 +126,13 @@
 
     </div><!-- /.container -->
 
-    <!-- Paceholder for New way to call API and bind it to a specific class 
-         which is later called with a <script type="text/x/shop-connector-template"> tag  -->
+    <!-- Paceholder for New way to call API and bind it to a specific class
+         which is later called with a <script type="text/x/shop-connector-template"> tag
     <script>_pushcommerce.get(['collection/frontpage/', 'frontpage-template']);</script>
-    <script>_pushcommerce.get(['collection/?product-type=coffee', 'collection-template']);</script>    
-    <script>_pushcommerce.get(['product/10-5oz-mug/', 'coffee-mug-template']);</script>]
+    <script>_pushcommerce.get(['collection/?product-type=coffee', 'collection-template']);</script>
+    <script>_pushcommerce.get(['product/10-5oz-mug/', 'coffee-mug-template']);</script>  -->
 
     <script type="text/javascript" src="static/shopify-connector/shopify-connector.js"></script>
-    <script type="text/javascript" src="static/shopify-connector/src/helpers.js"></script>
     <script type="text/javascript" src="static/js/shop.js"></script>
 
     <!-- Bootstrap core JavaScript
