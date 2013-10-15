@@ -41,7 +41,7 @@
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Categories <b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <script class="collection-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
+                    <script type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
                     {{#foreach collections}}
                       <li><a href="#">{{ title }}</a></li>
                     {{/foreach}}
@@ -62,14 +62,14 @@
     <div id="myCarousel" class="carousel slide">
       <!-- Indicators -->
       <ol class="carousel-indicators">
-        <script id='products-carousel-indicator' class="frontpage-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/frontpage/">
+        <script type="text/x-shopify-connector-template" data-src="/api/v1/collection/frontpage/">
         {{#foreach products}}
         <li data-target="#myCarousel" data-slide-to="{{ $index }}" class="{{#if $first}}active{{/if}}"></li>
         {{/foreach}}
         </script>
       </ol>
       <div class="carousel-inner">
-        <script id='products-carousel' class="frontpage-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/frontpage/">
+        <script type="text/x-shopify-connector-template" data-src="/api/v1/collection/frontpage/">
           {{#foreach products}}
           <div class="item {{#if $first}}active{{/if}}">
             <div class="img" style="background-image:url({{ featured_image }})"></div>
@@ -102,11 +102,11 @@
 
         <script class="collection-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
         {{#foreach collections}}
-          <div class="col-lg-4">
+          <div class="col-lg-4 {{#ifDivisibleBy $index 3}}clear{{/ifDivisibleBy}}">
             <img class="img-circle" src="{{#if image}}{{image}}{{else}}static/img/no-image.jpg{{/if}}" width="193px" height="185px">
             <h2>{{ title }}</h2>
             <div class="collection-body">
-            	{{{limit body_html 30}}}
+            	{{{nohtml body_html 30}}}
             </div>
             <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
           </div><!-- /.col-lg-4 -->

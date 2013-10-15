@@ -48,9 +48,9 @@
         /**
          * Executes the JSONP get request to fetch json response fron the server.
          *
-         * @param  {[type]}   url      The request url.
-         * @param  {[type]}   params   The request parameters.
-         * @param  {Function} callback The callback which needs to be invoked when response is received.
+         * @param  {string}     url      The request url.
+         * @param  {function}   callback The request parameters.
+         * @param  {params}     callback Optional, the callback which needs to be invoked when the response is received.
          **/
         getJSON: function getJSON(url, callback, params) {
             var param,
@@ -62,10 +62,10 @@
 
         /**
          * Gets the products response from the shop-connector.
-         * @param  {Function} callback    [description]
-         * @param  {[type]}   productType [description]
-         * @param  {[type]}   page        [description]
-         * @param  {[type]}   limit       [description]
+         * @param  {function} callback    The callback which needs to be invoked when the response is received.
+         * @param  {string}   productType Optional, If provided returns all the
+         * @param  {number}   page        Optional, the page number in the products set. Default 1
+         * @param  {number}   limit       Optional, the products count in the products set. Default 20
          **/
         getProducts: function getProducts(callback, productType, page, limit) {
             var params,
@@ -83,6 +83,12 @@
             jsonp.getJSON(url, callback, params);
         },
 
+        /**
+         * [getProductDetail description]
+         * @param  {[type]}   handle   [description]
+         * @param  {Function} callback [description]
+         * @return {[type]}            [description]
+         */
         getProductDetail: function getProduct(handle, callback) {
           var url = this.productUrl + handle + '/';
           jsonp.getJSON(url, callback);
@@ -106,62 +112,73 @@
         },
 
         /**
-         * Renders the template scripts into its parent node.
+         * Renders the template elements into its parent node.
          *
-         * @function
-         * @param {object} context The rendering context, usually the data received from shop-connector application.
-         * @param {Array(string)}
+         * @param {htmlElement, Array(htmlElement)} templateElements The template element or array of template elements which need to be renderened.
+         * @param {Object, string} context The rendering context, usually the data received from shop-connector application or its url.
+
          **/
-        renderTemplate: function renderTemplate(templateElement, context) {
+        renderTemplate: function renderTemplate(templateElements, context) {
 
             var parent,
+                element,
                 removableScripts = [],
                 source, html, templateTag, template,
                 i, iLen,
                 j, jLen, templateChildren,
                 self = this;
 
-            //debugger;
-
-            if (templateElement.getAttribute('type') !== 'text/x-shopify-connector-template') {
-                throw new Error('Invalid template. The attribute type="text/x-shopify-connector-template" not found.');
-            }
-
             if (typeof context === "string") {
                 //TODO: Improve caching...
                 if (self.cachedContext[context]) {
-                    self.renderTemplate(templateElement, self.cachedContext[context]);
+                    self.renderTemplate(templateElements, self.cachedContext[context]);
                 }
                 else {
                     self.getJSON(self.rootUrl + context, function(data) {
-                        self.cachedContext[context] = data;
-                        self.renderTemplate(templateElement, data);
+                        //self.cachedContext[context] = data;
+                        self.renderTemplate(templateElements, data);
                     });
                 }
                 return;
             }
 
-            console.log(context);
-
-            source = templateElement.innerHTML;
-            template = Handlebars.compile(source);
-            html = template(context);
-
-            templateTag = document.createElement('div');
-            templateTag.innerHTML = html;
-
-            parent = templateElement.parentElement;
-            templateChildren = templateTag.children;
-            for(j=0, jLen=templateChildren.length; j < jLen; j += 1) {
-                parent.insertBefore(templateChildren[0], templateElement);
+            if (templateElements instanceof Array === false) {
+                templateElements = [templateElements];
             }
-            removableScripts.push(templateElement);
+
+            for(i=0, iLen = templateElements.length; i < iLen; i += 1) {
+
+                element = templateElements[i];
+
+                if (element.getAttribute('type') !== 'text/x-shopify-connector-template') {
+                    throw new Error('Invalid template. The attribute type="text/x-shopify-connector-template" not found.');
+                }
+
+                source = element.innerHTML;
+                template = Handlebars.compile(source);
+                html = template(context);
+
+                templateTag = document.createElement('div');
+                templateTag.innerHTML = html;
+
+                parent = element.parentElement;
+                templateChildren = templateTag.children;
+                for(j=0, jLen=templateChildren.length; j < jLen; j += 1) {
+                    parent.insertBefore(templateChildren[0], element);
+                }
+                removableScripts.push(element);
+            }
 
             for (i=0, iLen=removableScripts.length; i < iLen; i += 1) {
                 removableScripts[i].parentElement.removeChild(removableScripts[i]);
             }
         },
 
+        /**
+         * Renders the templates which matches with specified selector using given context.
+         * @param  {string} selector The template selector.
+         * @param  {Object, string} context   The rendering context, usually the data received from shop-connector application or its url.
+         **/
         render: function render(selector, context) {
             var i, iLen, elements,
                 self = this;
@@ -207,9 +224,12 @@
 
     window.shopifyConnector = shopifyConnector;
 
+    // On page load, if data-src attribute is set, renders all shopify
+    // tempaltes (script elements whose type is "text/x-shopify-connector-template").
     function renderShopifyConnectorTemplates() {
         var scripts, script, renderableScripts = [],
             type, src,
+            url, urls = {},
             i, iLen;
 
         scripts = document.getElementsByTagName('script');
@@ -220,15 +240,15 @@
             src = script.getAttribute('data-src');
 
             if (type === 'text/x-shopify-connector-template' && src) {
-                renderableScripts.push({
-                    script: script,
-                    src: src
-                });
+                urls[src] = urls[src] || [];
+                urls[src].push(script);
             }
         }
-        for(i=0, iLen=renderableScripts.length; i < iLen; i += 1) {
-            shopifyConnector.renderTemplate(
-                renderableScripts[i].script, renderableScripts[i].src);
+
+        for(url in urls) {
+            if (urls.hasOwnProperty(url)) {
+                shopifyConnector.renderTemplate(urls[url], url);
+            }
         }
     }
 
@@ -261,7 +281,6 @@
 
 
             this[callbackFunc] = function(data) {
-                alert ('cool')
                 callback(data);
              };
 
@@ -2590,10 +2609,18 @@ Handlebars.template = Handlebars.VM.template;
             item.$index = index;
             item.$first = index === 0;
             item.$last  = index === arr.length-1;
+            item.$alternate = index % 2 === 0;
+
             return options.fn(item);
         }).join('');
     });
 
+    /**
+     * Truncates and limits the provided text if its length exceeds
+     * max.
+     * @example
+     * {{ limit value 10 }}
+     **/
     Handlebars.registerHelper('limit',function(str,max) {
         if (str.length > max) {
             return str.substring(0,max) + '...';
@@ -2630,6 +2657,61 @@ Handlebars.template = Handlebars.VM.template;
         }
         return nohtml;
     });
+
+    /**
+     * Provides equality condition check in template.
+     *
+     * @example
+     * {{#ifEqual val1 val2}}
+     * <p>Both values are equal.</p>
+     * {{else}}
+     * <p>Both values are different.</p>
+     * {{/ifEqual}}
+     *
+     **/
+    Handlebars.registerHelper('ifEqual', function(v1, v2, options) {
+        if(v1 === v2) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
+
+    /**
+     * Provides non-equality condition check in template.
+     *
+     * @example
+     * {{#ifNotEqual val1 val2}}
+     * <p>Both values are different.</p>
+     * {{else}}
+     * <p>Both values are equal.</p>
+     * {{/ifEqual}}
+     *
+     **/
+    Handlebars.registerHelper('ifEqual', function(v1, v2, options) {
+        if(v1 !== v2) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
+
+    /**
+     * Provides modulo condition check in template.
+     *
+     * @example
+     * {{#ifDivisibleBy value 3}}
+     * <p>The value is divisible by 3.</p>
+     * {{else}}
+     * <p>The value is not divisible by 3.</p>
+     * {{/ifEqual}}
+     *
+     **/
+    Handlebars.registerHelper('ifDivisibleBy', function(value, mod, options) {
+        if(value % mod === 0) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
+
 
 
 

@@ -23,10 +23,18 @@
             item.$index = index;
             item.$first = index === 0;
             item.$last  = index === arr.length-1;
+            item.$alternate = index % 2 === 0;
+
             return options.fn(item);
         }).join('');
     });
 
+    /**
+     * Truncates and limits the provided text if its length exceeds
+     * max.
+     * @example
+     * {{ limit value 10 }}
+     **/
     Handlebars.registerHelper('limit',function(str,max) {
         if (str.length > max) {
             return str.substring(0,max) + '...';
@@ -63,6 +71,61 @@
         }
         return nohtml;
     });
+
+    /**
+     * Provides equality condition check in template.
+     *
+     * @example
+     * {{#ifEqual val1 val2}}
+     * <p>Both values are equal.</p>
+     * {{else}}
+     * <p>Both values are different.</p>
+     * {{/ifEqual}}
+     *
+     **/
+    Handlebars.registerHelper('ifEqual', function(v1, v2, options) {
+        if(v1 === v2) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
+
+    /**
+     * Provides non-equality condition check in template.
+     *
+     * @example
+     * {{#ifNotEqual val1 val2}}
+     * <p>Both values are different.</p>
+     * {{else}}
+     * <p>Both values are equal.</p>
+     * {{/ifEqual}}
+     *
+     **/
+    Handlebars.registerHelper('ifEqual', function(v1, v2, options) {
+        if(v1 !== v2) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
+
+    /**
+     * Provides modulo condition check in template.
+     *
+     * @example
+     * {{#ifDivisibleBy value 3}}
+     * <p>The value is divisible by 3.</p>
+     * {{else}}
+     * <p>The value is not divisible by 3.</p>
+     * {{/ifEqual}}
+     *
+     **/
+    Handlebars.registerHelper('ifDivisibleBy', function(value, mod, options) {
+        if(value % mod === 0) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
+
 
 
 
