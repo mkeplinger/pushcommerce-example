@@ -8,8 +8,8 @@
      */
     function ShopifyConnector() {
 
-        //this.rootUrl = "http://shopify-connector.appspot.com/api/v1/";
-        this.rootUrl = "http://localhost:8000";
+        this.rootUrl = "http://shopify-connector.appspot.com";
+        //this.rootUrl = "http://localhost:8000";
         this.productUrl = this.rootUrl + '/product/';
         this.collectionUrl = this.rootUrl + '/collection/';
         this.utils = {};
