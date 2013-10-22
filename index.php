@@ -1,61 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="shortcut icon" href="static/ico/favicon.png">
-
-    <!-- Bootstrap core CSS -->
-    <title>ShopConnector Minimalistic Prototype</title>
-    <link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap.css">
-    <link rel="stylesheet" type="text/css" href="static/css/style.css">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="/static/js/html5shiv.js"></script>
-      <script src="/static/js/respond.min.js"></script>
-    <![endif]-->
-
-  </head>
-<!-- NAVBAR
-================================================== -->
-  <body>
-    <div class="navbar-wrapper">
-      <div class="container">
-
-        <div class="navbar navbar-inverse navbar-static-top">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="#">ShopConnector Prototype</a>
-            </div>
-            <div class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Categories <b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <script type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
-                    {{#foreach collections}}
-                      <li><a href="#">{{ title }}</a></li>
-                    {{/foreach}}
-                    </script>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
+<?php include("inc/header.php"); ?>
 
     <!-- Carousel
     ================================================== -->
@@ -91,7 +34,7 @@
 
 
 
-    <!-- Marketing messaging and featurettes
+    <!-- Collections
     ================================================== -->
     <!-- Wrap the rest of the page in another container to center all the content. -->
 
@@ -100,7 +43,7 @@
       <!-- Three columns of text below the carousel -->
       <div class="row">
 
-        <script class="collection-template" type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
+        <script type="text/x-shopify-connector-template" data-src="/api/v1/collection/">
         {{#foreach collections}}
           <div class="col-lg-4 {{#ifDivisibleBy $index 3}}clear{{/ifDivisibleBy}}">
             <img class="img-circle" src="{{#if image}}{{image}}{{else}}static/img/no-image.jpg{{/if}}" width="193px" height="185px">
@@ -114,32 +57,6 @@
         </script>
 
       </div><!-- .row -->
-
-
-
-
-      <!-- FOOTER -->
-      <footer>
-        <p class="pull-right"><a href="#">Back to top</a></p>
-        <p>&copy; 2013 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
-      </footer>
-
     </div><!-- /.container -->
 
-    <!-- Paceholder for New way to call API and bind it to a specific class
-         which is later called with a <script type="text/x/shop-connector-template"> tag
-    <script>_pushcommerce.get(['collection/frontpage/', 'frontpage-template']);</script>
-    <script>_pushcommerce.get(['collection/?product-type=coffee', 'collection-template']);</script>
-    <script>_pushcommerce.get(['product/10-5oz-mug/', 'coffee-mug-template']);</script>  -->
-
-    <script type="text/javascript" src="static/shopify-connector/shopify-connector.js"></script>
-    <script type="text/javascript" src="static/js/shop.js"></script>
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="static/js/libs/jquery.js"></script>
-    <script src="static/js/libs/holder.js"></script>
-    <script src="static/bootstrap/js/bootstrap.min.js"></script>
-  </body>
-</html>
+<?php include("inc/footer.php"); ?>

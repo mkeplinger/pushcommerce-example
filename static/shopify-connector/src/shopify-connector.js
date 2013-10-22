@@ -132,7 +132,7 @@
                 }
 
                 source = element.innerHTML;
-                template = Handlebars.compile(source);
+                template = Handlebars.compile(source, {noEscape: true});
                 html = template(context);
 
                 templateTag = document.createElement('div');
