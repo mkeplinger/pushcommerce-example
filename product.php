@@ -1,5 +1,5 @@
 <?php include("inc/header.php"); ?>
-<?php $product = $_SERVER['QUERY_STRING']; ?>
+<?php $product = $_GET['product']; ?>
     <script type="text/x-shopify-connector-template" data-src="/api/v1/product/<?php echo $product  ?>/">
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">

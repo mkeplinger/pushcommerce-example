@@ -1,5 +1,5 @@
 <?php include("inc/header.php"); ?>
-<?php $collection = $_SERVER['QUERY_STRING']; ?>
+<?php $collection = $_GET['collection']; ?>
     <script type="text/x-shopify-connector-template" data-src="/api/v1/collection/<?php echo $collection  ?>/">
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
@@ -25,7 +25,7 @@
             <div class="collection-body">
                 {{{nohtml body_html 30}}}
             </div>
-            <p><a class="btn btn-default" href="product.php?{{ handle }}">View details &raquo;</a></p>
+            <p><a class="btn btn-default" href="product.php?product={{handle}}">View details &raquo;</a></p>
           </div><!-- /.col-lg-4 -->
         {{/foreach}}
         </script>

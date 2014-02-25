@@ -20,7 +20,7 @@
               <div class="carousel-caption">
                 <h1>{{ name }}</h1>
                 <p>{{{ nohtml body_html 50}}}</p>
-                <p><a class="btn btn-large btn-primary" href="#">Learn more</a></p>
+                <p><a class="btn btn-large btn-primary" href="product.php?product={{handle}}">Learn more</a></p>
               </div>
             </div>
           </div>
@@ -51,7 +51,7 @@
             <div class="collection-body">
             	{{{nohtml body_html 30}}}
             </div>
-            <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
+            <p><a class="btn btn-default" href="collection.php?colletion={{handle}}">View details &raquo;</a></p>
           </div><!-- /.col-lg-4 -->
         {{/foreach}}
         </script>
